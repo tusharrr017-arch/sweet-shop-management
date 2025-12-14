@@ -27,7 +27,15 @@ const Login = () => {
       message.success('Login successful!');
       navigate('/');
     } catch (err: any) {
-      const errorMessage = err.response?.data?.error || err.message || 'Login failed';
+      let errorMessage = 'Login failed';
+      if (err.response?.data?.error) {
+        errorMessage = err.response.data.error;
+      } else if (err.message) {
+        errorMessage = err.message;
+      } else if (typeof err === 'string') {
+        errorMessage = err;
+      }
+      
       message.error(errorMessage.includes('Invalid credentials') 
         ? 'Invalid email or password. Please check your credentials and try again.'
         : errorMessage
