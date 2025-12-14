@@ -84,7 +84,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('user', JSON.stringify(newUser));
       axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
     } catch (error: any) {
-      throw new Error(error.response?.data?.error || 'Login failed');
+      console.error('Login error details:', error);
+      const errorMsg = error.response?.data?.error || error.message || 'Login failed';
+      throw new Error(errorMsg);
     }
   };
 
@@ -99,7 +101,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('user', JSON.stringify(newUser));
       axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
     } catch (error: any) {
-      throw new Error(error.response?.data?.error || 'Registration failed');
+      console.error('Registration error details:', error);
+      const errorMsg = error.response?.data?.error || error.message || 'Registration failed';
+      throw new Error(errorMsg);
     }
   };
 

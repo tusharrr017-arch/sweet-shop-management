@@ -27,7 +27,18 @@ const Register = () => {
       message.success('Registration successful!');
       navigate('/');
     } catch (err: any) {
-      const errorMessage = err.response?.data?.error || err.message || 'Registration failed';
+      let errorMessage = 'Registration failed';
+      if (err.response?.data?.error) {
+        errorMessage = err.response.data.error;
+      } else if (err.message) {
+        errorMessage = err.message;
+      } else if (typeof err === 'string') {
+        errorMessage = err;
+      } else if (err.response?.data) {
+        errorMessage = JSON.stringify(err.response.data);
+      }
+      
+      console.error('Registration error:', err);
       message.error(errorMessage);
       
       if (errorMessage.includes('already exists')) {
