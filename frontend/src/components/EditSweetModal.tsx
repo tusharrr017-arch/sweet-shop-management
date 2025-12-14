@@ -39,6 +39,8 @@ const EditSweetModal = ({ sweet, onClose, onUpdate }: EditSweetModalProps) => {
         status: 'done',
         url: sweet.image_url,
       }]);
+    } else {
+      setFileList([]);
     }
   }, [sweet, form]);
 
@@ -50,24 +52,30 @@ const EditSweetModal = ({ sweet, onClose, onUpdate }: EditSweetModalProps) => {
   }) => {
     setLoading(true);
     try {
-      let imageUrl: string | undefined = sweet.image_url;
+      let imageUrl: string | undefined = undefined;
       
-      if (fileList.length > 0 && fileList[0].originFileObj) {
-        try {
-          imageUrl = await convertFileToBase64(fileList[0].originFileObj);
-        } catch (error) {
-          message.error('Failed to process image');
-          setLoading(false);
-          return;
+      if (fileList.length > 0) {
+        const file = fileList[0];
+        if (file.originFileObj) {
+          try {
+            imageUrl = await convertFileToBase64(file.originFileObj);
+          } catch (error) {
+            message.error('Failed to process image');
+            setLoading(false);
+            return;
+          }
+        } else if (file.url) {
+          imageUrl = file.url;
         }
-      } else if (fileList.length === 0 && sweet.image_url) {
-        imageUrl = undefined;
       }
-
-      onUpdate({ ...values, image_url: imageUrl });
+      
+      const updates = { ...values, image_url: imageUrl };
+      console.log('Updating sweet with:', { ...updates, image_url: imageUrl ? 'base64 image (length: ' + imageUrl.length + ')' : 'no image' });
+      onUpdate(updates);
       onClose();
     } catch (error) {
       console.error('Update error:', error);
+      message.error('Failed to update sweet');
     } finally {
       setLoading(false);
     }
