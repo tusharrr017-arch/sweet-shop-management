@@ -1,13 +1,12 @@
 {
   "version": 2,
   "installCommand": "cd api && npm install && cd ../backend && npm install && cd ../frontend && npm install",
-  "buildCommand": "cd backend && npm run build",
   "builds": [
     {
       "src": "api/index.ts",
       "use": "@vercel/node",
       "config": {
-        "includeFiles": "backend/dist/**",
+        "includeFiles": "backend/**",
         "maxLambdaSize": "50mb"
       }
     },
