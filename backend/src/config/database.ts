@@ -91,12 +91,22 @@ async function initializeDatabase() {
         throw err;
       }
     } else {
+      if (!process.env.DATABASE_URL) {
+        throw new Error('DATABASE_URL environment variable is not set');
+      }
       pgPool = new Pool({
         connectionString: process.env.DATABASE_URL,
         ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
       });
-      dbInitialized = true;
-      console.log('PostgreSQL database connected');
+      
+      try {
+        await pgPool.query('SELECT 1');
+        dbInitialized = true;
+        console.log('PostgreSQL database connected');
+      } catch (err) {
+        console.error('PostgreSQL connection error:', err);
+        throw err;
+      }
     }
   })();
   

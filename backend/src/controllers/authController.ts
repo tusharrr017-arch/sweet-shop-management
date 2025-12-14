@@ -34,16 +34,23 @@ export const register = async (req: Request, res: Response) => {
       { expiresIn } as jwt.SignOptions
     );
 
-    res.status(201).json({
-      message: 'User registered successfully',
-      token,
-      user: { id: user.id, email: user.email, role: user.role },
-    });
+      res.status(201).json({
+        message: 'User registered successfully',
+        token,
+        user: { id: user.id, email: user.email, role: user.role },
+      });
+    } catch (dbError: any) {
+      console.error('Database error during registration:', dbError);
+      throw dbError;
+    }
   } catch (error: any) {
     console.error('Registration error:', error);
     console.error('Error details:', error.message, error.stack);
+    const errorMessage = error.message || 'Internal server error';
     res.status(500).json({ 
-      error: 'Internal server error',
+      error: errorMessage.includes('DATABASE_URL') || errorMessage.includes('connection') 
+        ? 'Database connection error. Please check your database configuration.'
+        : 'Internal server error',
       details: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
